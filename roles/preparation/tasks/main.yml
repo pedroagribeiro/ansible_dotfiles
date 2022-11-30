@@ -1,0 +1,10 @@
+---
+
+- name: Update all the repositories packages version
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Update all packages to their latest version
+  ansible.builtin.apt:
+    name: "*"
+    state: latest

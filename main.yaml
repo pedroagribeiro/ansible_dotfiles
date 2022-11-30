@@ -1,0 +1,14 @@
+- name: Run the preparation steps
+  hosts: all
+  roles:
+    - preparation
+
+- name: Run the Docker role
+  hosts: all
+  roles:
+    - docker
+
+- name: Run the Zsh role
+  hosts: all
+  roles:
+    - zsh

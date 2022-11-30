@@ -1,0 +1,41 @@
+---
+
+- name: Install the necessary packages to run the ZSH shell
+  ansible.builtin.apt:
+    package:
+      - zsh
+  become: true
+
+- name: Installing Oh My Zsh...
+  ansible.builtin.shell:
+    cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+- name: Cloning the zsh-autosuggestions plugin...
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "{{ zsh_custom }}/plugins/zsh-autosuggestions"
+
+- name: Cloning the zsh-syntax-highlighting plugin...
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting
+    dest: "{{ zsh_custom }}/plugins/zsh-syntax-highlighting"
+
+- name: Cloning the fzf-tab plugin...
+  ansible.builtin.git:
+    repo: https://github.com/Aloxaf/fzf-tab
+    dest: "{{ zsh_custom }}/plugins/fzf-tab"
+
+- name: Installing zplug...
+  ansible.builtin.shell:
+    cmd: curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+
+- name: Create zshrc symlink
+  ansible.builtin.file:
+    src: "{{ home }}/.dotfiles/roles/zsh/files/zshrc"
+    dest: "{{ home }}/.zshrc"
+    state: link
+
+- name: Set Zsh as the default shell prompt for the system
+  ansible.builtin.shell:
+    cmd: "chsh --shell $(command -v zsh) {{ user }}"
+  become: true

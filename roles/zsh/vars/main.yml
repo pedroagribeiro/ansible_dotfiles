@@ -1,0 +1,4 @@
+---
+user: pedro
+home: "/home/{{ user }}"
+zsh_custom: "{{ home }}/.oh-my-zsh/custom"

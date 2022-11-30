@@ -1,0 +1,14 @@
+---
+
+- name: Install the necessary packages to run the Docker environment 
+  ansible.builtin.apt:
+    package:
+      - docker.io
+      - docker-compose
+  become: true
+
+- name: Add the 'pedro' user to the docker group
+  ansible.builtin.user:
+    name: pedro
+    group: docker
+  become: true

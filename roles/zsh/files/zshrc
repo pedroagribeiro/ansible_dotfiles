@@ -1,0 +1,47 @@
+#              _
+#             | |
+#      _______| |__  _ __ ___
+#     |_  / __| '_ \| '__/ __|
+#    _ / /\__ \ | | | | | (__
+#   (_)___|___/_| |_|_|  \___|
+
+export GPG_TTY=$(tty)
+export DOTFILES="$HOME/.dotfiles"
+
+for module in $(ls $DOTFILES/zsh/*.zsh); do
+  source $module
+done
+
+source $DOTFILES/zsh/aliases.zsh
+
+# go to working directory if it has one
+gtwd
+
+for init_file in $(ls $DOTFILES/**/*.init); do
+  source $init_file
+done
+
+# zplug
+# source ~/.zplug/init.zsh
+
+# zplug "hlissner/zsh-autopair", defer:2
+
+# zplug load
+
+# # start typing + [Up-Arrow] - fuzzy find history forward
+# if [[ "${terminfo[kcuu1]}" != "" ]]; then
+#   autoload -U up-line-or-beginning-search
+#   zle -N up-line-or-beginning-search
+#   bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
+# fi
+# # start typing + [Down-Arrow] - fuzzy find history backward
+# if [[ "${terminfo[kcud1]}" != "" ]]; then
+#   autoload -U down-line-or-beginning-search
+#   zle -N down-line-or-beginning-search
+#   bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
+# fi
+
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# To customize prompt, run `p10k configure` or edit ~/.dotfiles/zsh/themes/p10k.zsh.
+# [[ ! -f ~/.dotfiles/zsh/themes/p10k.zsh ]] || source ~/.dotfiles/zsh/themes/p10k.zsh
