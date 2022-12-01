@@ -1,0 +1,42 @@
+---
+
+- name: Clone git-fuzzy
+  tags:
+      # Suppress warning: [ANSIBLE0006] git used in place of git module
+      # Git module doesn't allow us to set `core.autocrlf=input`.
+      - skip_ansible_lint
+  become: true
+  become_user: '{{ user.username }}'
+  # core.autocrlf=input prevents https://github.com/robbyrussell/oh-my-zsh/issues/4402
+  command: 'git clone https://github.com/robbyrussell/oh-my-zsh.git ~{{ user.username }}/.git-fuzzy'
+  args:
+    chdir: '~{{ user.username }}'
+    creates: '~{{ user.username }}/.git-fuzzy'
+  with_items: "{{ users }}"
+  when: "((user.git_fuzzy | default({})).install | default(oh_my_zsh_install)) | bool"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
+
+- name: Update git-fuzzy
+  tags:
+      - skip_ansible_lint
+  become: true
+  become_user: '{{ user.username }}'
+  command: 'git -C ~{{ user.username }}/.git-fuzzy pull'
+  with_items: "{{ users }}"
+  when: "((user.git_fuzzy | default({})).install | default(oh_my_zsh_install)) | bool"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
+
+- name: Create gitconfig symlink
+  ansible.builtin.file:
+    src: "~{{ user.username }}/.dotfiles/roles/git/files/gitconfig"
+    dest: "~{{ user.username }}/.gitconfig"
+    state: link
+  become: true
+  with_items: "{{ users }}"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'

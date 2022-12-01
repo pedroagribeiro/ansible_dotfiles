@@ -8,11 +8,11 @@
 export GPG_TTY=$(tty)
 export DOTFILES="$HOME/.dotfiles"
 
-for module in $(ls $DOTFILES/zsh/*.zsh); do
+for module in $(ls $DOTFILES/roles/zsh/files/*.zsh); do
   source $module
 done
 
-source $DOTFILES/zsh/aliases.zsh
+source $DOTFILES/roles/zsh/files/aliases.zsh
 
 # go to working directory if it has one
 gtwd

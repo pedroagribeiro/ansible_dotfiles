@@ -1,10 +1,12 @@
 - name: Run the preparation steps
   hosts: all
+  become: true
   roles:
     - preparation
 
 - name: Run the Docker role
   hosts: all
+  become: true
   roles:
     - docker
 
@@ -12,3 +14,8 @@
   hosts: all
   roles:
     - zsh
+
+- name: Run the Git role
+  hosts: all
+  roles:
+    - git

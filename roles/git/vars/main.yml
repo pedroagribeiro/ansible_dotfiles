@@ -1,0 +1,7 @@
+---
+git_fuzzy_install: false 
+
+users: 
+  - username: pedro
+    git_fuzzy: 
+      install: true

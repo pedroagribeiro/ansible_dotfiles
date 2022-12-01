@@ -1,41 +1,94 @@
 ---
 
-- name: Install the necessary packages to run the ZSH shell
+- name: Install oh-my-zsh dependencies 
   ansible.builtin.apt:
-    package:
-      - zsh
+    package: '{{ dependencies }}'
   become: true
 
-- name: Installing Oh My Zsh...
-  ansible.builtin.shell:
-    cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+- name: Clone oh-my-zsh
+  tags:
+    # Suppress warning: [ANSIBLE0006] git used in place of git module
+    # Git module doesn't allow us to set `core.autocrlf=input`.
+    - skip_ansible_lint
+  become: true
+  become_user: '{{ user.username }}'
+  # core.autocrlf=input prevents https://github.com/robbyrussell/oh-my-zsh/issues/4402
+  command: 'git clone -c core.autocrlf=input --depth=1 https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh'
+  args:
+    chdir: '~{{ user.username }}'
+    creates: '~{{ user.username }}/.oh-my-zsh'
+  with_items: "{{ users }}"
+  when: "((user.oh_my_zsh | default({})).install | default(oh_my_zsh_install)) | bool"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
+
+- name: Set permissions of oh-my-zsh for users
+  become: yes
+  file:
+    path: '~{{ user.username }}/.oh-my-zsh'
+    # Prevent the cloned repository from having insecure permissions. Failing to do
+    # so causes compinit() calls to fail with "command not found: compdef" errors
+    # for users with insecure umasks (e.g., "002", allowing group writability).
+    mode: 'go-w'
+    recurse: yes
+  with_items: "{{ users }}"
+  when: "((user.oh_my_zsh | default({})).install | default(oh_my_zsh_install)) | bool"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
 
 - name: Cloning the zsh-autosuggestions plugin...
   ansible.builtin.git:
     repo: https://github.com/zsh-users/zsh-autosuggestions
-    dest: "{{ zsh_custom }}/plugins/zsh-autosuggestions"
+    dest: '~{{ user.username }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions'
+  with_items: "{{ users }}"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
 
 - name: Cloning the zsh-syntax-highlighting plugin...
   ansible.builtin.git:
     repo: https://github.com/zsh-users/zsh-syntax-highlighting
-    dest: "{{ zsh_custom }}/plugins/zsh-syntax-highlighting"
+    dest: '~{{ user.username }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting'
+  with_items: "{{ users }}"  
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
 
 - name: Cloning the fzf-tab plugin...
   ansible.builtin.git:
     repo: https://github.com/Aloxaf/fzf-tab
-    dest: "{{ zsh_custom }}/plugins/fzf-tab"
+    dest: '~{{ user.username }}/.oh-my-zsh/custom/plugins/fzf-tab'
+  with_items: "{{ users }}"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
 
-- name: Installing zplug...
-  ansible.builtin.shell:
-    cmd: curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+# - name: Installing zplug...
+#   ansible.builtin.shell:
+#     cmd: "curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh"
+
+- name: Set default shell for users
+  become: true
+  user:
+    name: '{{ user.username }}'
+    shell: /bin/zsh
+  with_items: "{{ users }}"
+  when: "((user.oh_my_zsh | default({})).install | default(oh_my_zsh_install)) | bool"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
 
 - name: Create zshrc symlink
   ansible.builtin.file:
-    src: "{{ home }}/.dotfiles/roles/zsh/files/zshrc"
-    dest: "{{ home }}/.zshrc"
+    src: "~{{ user.username }}/.dotfiles/roles/zsh/files/zshrc"
+    dest: "~{{ user.username }}/.zshrc"
     state: link
-
-- name: Set Zsh as the default shell prompt for the system
-  ansible.builtin.shell:
-    cmd: "chsh --shell $(command -v zsh) {{ user }}"
   become: true
+  with_items: "{{ users }}"
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
+  
+ 

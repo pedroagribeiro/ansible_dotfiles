@@ -1,4 +1,11 @@
 ---
-user: pedro
-home: "/home/{{ user }}"
-zsh_custom: "{{ home }}/.oh-my-zsh/custom"
+oh_my_zsh_install: true 
+
+dependencies:
+  - git
+  - zsh
+
+users: 
+  - username: pedro
+    oh_my_zsh: 
+      install: true
