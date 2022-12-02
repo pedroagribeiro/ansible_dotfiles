@@ -3,7 +3,7 @@
     useConfigOnly = true
 [include]
     path = ~/.dotfiles/roles/git/files/personal.config
-[includeIf "gitdir:~/Code/AlticeLabs/"]
+[includeIf "gitdir:~/Code/alticelabs/"]
     path = ~/.dotfiles/roles/git/files/alticelabs.config
 [web]
     browser = google-chrome-stable
