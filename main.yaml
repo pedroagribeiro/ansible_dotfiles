@@ -30,3 +30,8 @@
   roles:
     - golang
 
+- name: Run the nodejs role
+  hosts: all
+  roles:
+   - nodejs
+

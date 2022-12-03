@@ -1,0 +1,8 @@
+---
+
+- name: Create default-npm-pkgs symlink
+  ansible.builtin.file:
+    src: "~{{ user.username }}/.dotfiles/roles/nodejs/files/default-npm-pkgs"
+    dest: "~{{ user.username }}/.default-npm-pkgs"
+    state: link
+  become: true
