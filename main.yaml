@@ -20,7 +20,13 @@
   roles:
     - git
 
-- name: Run the Asdf role
+# - name: Run the Asdf role
+#   hosts: all
+#   roles:
+#     - asdf
+
+- name: Run the GoLang role
   hosts: all
   roles:
-    - asdf
+    - golang
+

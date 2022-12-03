@@ -1,0 +1,8 @@
+---
+
+- name: Create default-golang-pkgs symlink
+  ansible.builtin.file:
+    src: "~{{ user.username }}/.dotfiles/roles/golang/files/default-golang-pkgs"
+    dest: "~{{ user.username }}/.default-golang-pkgs"
+    state: link
+  become: true
