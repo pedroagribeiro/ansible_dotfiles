@@ -19,3 +19,8 @@
   hosts: all
   roles:
     - git
+
+- name: Run the Asdf role
+  hosts: all
+  roles:
+    - asdf

@@ -1,0 +1,65 @@
+---
+
+- name: Install asdf dependencies 
+  ansible.builtin.apt:
+    package: '{{ dependencies }}'
+  become: true
+
+- name: Clone asdf
+  tags:
+    # Suppress warning: [ANSIBLE0006] git used in place of git module
+    # Git module doesn't allow us to set `core.autocrlf=input`.
+    - skip_ansible_lint
+  become: true
+  become_user: '{{ user.username }}'
+  command: 'git clone https://github.com/asdf-vm/asdf.git /home/{{ user.username }}/.asdf'
+  args:
+    chdir: '~{{ user.username }}'
+    creates: '~{{ user.username }}/.asdf'
+  when: "((user.asdf | default({})).install | default(asdf_install)) | bool"
+
+# - name: Checkout the most recent asdf git tag
+#   become: true
+#   become_user: '{{ user.username }}'
+#   command: 'git -C /home/{{ user.username }}/.asdf checkout "$(git -C /home/{{ user.username }}/.asdf describe --abbrev=0 --tags)"'
+#   when: "((user.asdf | default({})).install | default(asdf_install)) | bool"
+
+- name: Force asdf to update itself
+  become: true
+  become_user: '{{ user.username }}'
+  command: 'asdf update'
+  when: "((user.asdf | default({})).install | default(asdf_install)) | bool"
+
+- name: Install all the asdf plugins
+  command: 'asdf plugin-add {{ plugin }}'
+  with_items: "{{ plugins }}"
+  when: "((user.asdf | default({})).install | default(asdf_install)) | bool"
+  with_items: '{{ plugins }}'
+  loop_control:
+    loop_var: plugin
+
+- name: Forcefully update all the plugins
+  command: 'asdf plugin-update --all'
+  when: "((user.asdf | default({})).install | default(asdf_install)) | bool"
+
+- name: Create asdfrc symlink
+  ansible.builtin.file:
+    src: "~{{ user.username }}/.dotfiles/roles/asdf/files/asdfrc"
+    dest: "~{{ user.username }}/.asdfrc"
+    state: link
+  become: true
+
+- name: Create tool-versions symlink
+  ansible.builtin.file:
+    src: "~{{ user.username }}/.dotfiles/roles/asdf/files/tool-versions"
+    dest: "~{{ user.username }}/.tool-versions"
+    state: link
+  become: true
+
+- name: Install all the asdf languages
+  command: 'asdf install {{ version }}'
+  with_items: "{{ versions }}"
+  when: "((user.asdf | default({})).install | default(asdf_install)) | bool"
+  with_items: '{{ versions }}'
+  loop_control:
+    loop_var: version

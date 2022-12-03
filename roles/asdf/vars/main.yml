@@ -1,0 +1,24 @@
+---
+asdf_install: true
+
+user:
+  username: pedro
+
+dependencies:
+  - libbz2-dev
+  - libncurses-dev
+  - libffi-dev
+  - libreadline-dev
+  - libssl-dev
+
+plugins:
+  - golang
+  - java
+  - nodejs
+  - python
+
+versions:
+  - golang 1.18.4
+  - java openjdk-17
+  # - nodejs lts
+  - python 3.10.4
