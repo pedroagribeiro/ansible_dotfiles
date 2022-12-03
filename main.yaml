@@ -35,3 +35,7 @@
   roles:
    - nodejs
 
+- name: Run the python role
+  hosts: all
+  roles:
+    - python
